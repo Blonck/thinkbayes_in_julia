@@ -1,8 +1,19 @@
 module thinkbayes
 
-export Pmf, prob, probs, total, mult!, normalize!
+export Pmf, create_pmf, prob, probs, total, mult!, normalize!
+
 
 Pmf{T} = Dict{T, Float64} where T <: Any
+
+
+function create_pmf(hypos::AbstractArray{T, 1}) where T <: Any
+    pmf = Pmf{T}()
+    for hypo in hypos
+        pmf[hypo] = 1.0
+    end
+    normalize!(pmf)
+end
+
 
 function prob(pmf::Pmf{T}, x::T, default::Float64=0.0) where T <: Any
     get(pmf, x, default)

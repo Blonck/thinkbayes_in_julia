@@ -2,12 +2,9 @@ using Test
 using thinkbayes
 
 @testset "Pmf test" begin
-    pmf = Pmf{Any}()
+    pmf = create_pmf(["Set A", "Set B"])
 
-    pmf["Set A"] = 0.5
-    pmf["Set B"] = 0.5
-
-    # test prob
+    # test prob and create
     @test prob(pmf, "Set A") == 0.5
     @test prob(pmf, "Set B") == 0.5
     @test prob(pmf, "Set C") == 0.0
