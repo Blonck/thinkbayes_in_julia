@@ -92,3 +92,12 @@ end
 update_monty!(pmf, 'B')
 
 println("pmf of Monty Hall after seen data: $pmf")
+println("")
+
+suite = Suite([i for i in "ABC"], likelihood_monty)
+println("suite of Monty Hall problem: $suite")
+
+update!(suite, 'B')
+println("suite of Monty Hall problem after seen data: $suite")
+
+

@@ -1,6 +1,7 @@
 module thinkbayes
 
 export Pmf, create_pmf, prob, probs, total, mult!, normalize!
+export Suite, update!
 
 
 Pmf{T} = Dict{T, Float64} where T <: Any
@@ -50,4 +51,22 @@ function normalize!(pmf::Pmf; fraction::Float64=1.0)
     pmf
 end
 
+struct Suite
+    pmf :: Pmf
+    likelihood
+
+    function Suite(hypos::AbstractArray{T, 1}, likelihood) where T <: Any
+        new(create_pmf(hypos), likelihood)
+    end
 end
+
+function update!(suite::Suite, data)
+    for hypo in keys(suite.pmf)
+        like = suite.likelihood(suite.pmf, data, hypo)
+        mult!(suite.pmf, hypo, like)
+    end
+    normalize!(suite.pmf)
+end
+
+
+end # end of module
