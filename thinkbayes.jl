@@ -6,6 +6,18 @@ export Suite, update!
 
 Pmf{T} = Dict{T, Float64} where T <: Any
 
+function Base.show(io::IO, pmf::Pmf{T}) where T <: Any
+    print(io, "Pmf(")
+    print(io, join(["$k=>$v" for (k, v) in pmf], ","))
+    print(io, ")")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", pmf::Pmf{T}) where T <: Any
+    print(io, "Probability mass function:\n")
+    for (k, v) in pmf
+        print(io, " $k => $v\n")
+    end
+end
 
 function create_pmf(hypos::AbstractArray{T, 1}) where T <: Any
     pmf = Pmf{T}()
@@ -67,6 +79,20 @@ function update!(suite::Suite, data)
     end
     normalize!(suite.pmf)
 end
+
+function Base.show(io::IO, suite::Suite)
+    print(io, "Suite($(suite.pmf))")
+end
+
+function Base.show(io::IO, ::MIME"text/plain", suite)
+    print(io, "Bayesian suite\n")
+    print(io, " current pmf:\n")
+    for (k, v) in suite.pmf
+        print(io, "  $k => $v\n")
+    end
+    print(io, " likelihood: $(string(suite.likelihood))\n")
+end
+
 
 
 end # end of module
