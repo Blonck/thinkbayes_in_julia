@@ -101,3 +101,38 @@ update!(suite, 'B')
 println("suite of Monty Hall problem after seen data: $suite")
 
 
+# the M&M problem
+
+mix94 = Dict(:brown => 30,
+             :yellow => 20,
+             :red => 20,
+             :green => 10,
+             :orange => 10,
+             :tan => 10)
+
+mix96 = Dict(:blue => 24,
+             :green => 20,
+             :orange => 16,
+             :yellow => 14,
+             :red => 13,
+             :brown => 13)
+
+hypoA = Dict(:bag1 => mix94, :bag2 =>mix96)
+hypoB = Dict(:bag1 => mix96, :bag2 =>mix94)
+hypos = Dict('A' => hypoA, 'B' => hypoB)
+
+function likelihood_m_and_m(pmf::Pmf, data, hypo)
+    bag, color = data
+    mix = hypos[hypo][bag]
+    mix[color]
+end
+
+suite = Suite([i for i in keys(hypos)], likelihood_m_and_m)
+
+println("suite of M&M problem: $suite")
+
+update!(suite, (:bag1, :yellow))
+update!(suite, (:bag2, :green))
+
+println("suite of M&M problem after seen data: $suite")
+
