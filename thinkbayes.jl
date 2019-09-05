@@ -1,6 +1,6 @@
 module thinkbayes
 
-export Pmf, create_pmf, prob, probs, total, mult!, normalize!
+export Pmf, create_pmf, create_pmf_power_law, prob, probs, total, mult!, normalize!
 export Suite, update!, mean
 
 
@@ -28,6 +28,21 @@ function create_pmf(hypos::AbstractArray{T, 1}) where T <: Any
         pmf[hypo] = 1.0
     end
     normalize!(pmf)
+end
+
+
+function create_pmf(hypos::AbstractArray{T, 1}; init_prob::Function = x -> 1.0) where T <: Number
+    pmf = Pmf{T}()
+    for hypo in hypos
+        pmf[hypo] = init_prob(hypo)
+    end
+    normalize!(pmf)
+end
+
+
+function create_pmf_power_law(hypos::AbstractArray{T, 1}; alpha=1.0) where T <: Number
+    power_law(x) = x^(-1.0 * alpha)
+    create_pmf(hypos, init_prob = power_law)
 end
 
 
@@ -82,6 +97,10 @@ struct Suite
 
     function Suite(hypos::AbstractArray{T, 1}, likelihood) where T <: Any
         new(create_pmf(hypos), likelihood)
+    end
+
+    function Suite(pmf::Pmf{T}, likelihood) where T <: Any
+        new(pmf, likelihood)
     end
 end
 
