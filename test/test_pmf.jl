@@ -36,4 +36,8 @@ using thinkbayes
     mult!(pmf, "Set B", 0.5)
     @test prob(pmf, "Set A") == 1.0 * 2.0
     @test prob(pmf, "Set B") == 1.0 * 0.5
+
+    # test mean
+    pmf = create_pmf([2, 4, 6])
+    @test mean(pmf) == 4.0
 end

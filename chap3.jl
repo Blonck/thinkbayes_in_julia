@@ -2,6 +2,8 @@ push!(LOAD_PATH, pwd())
 
 using thinkbayes
 
+# dice problem
+
 function likelihood_dice(pmf::Pmf, data, hypo)
     if hypo < data
         0.0
@@ -23,3 +25,23 @@ for roll in [6,8, 7, 7, 5, 4]
 end
 
 println("Dice suite after seen all data: $dice")
+
+# locomotive problem
+
+function likelihood_train(pmf::Pmf, data, hypo)
+    if hypo < data
+        0.0
+    else
+        1.0/hypo
+    end
+end
+
+train = Suite(collect(1:1000), likelihood_train)
+
+println("Train suite, mean value: $(mean(train))")
+
+update!(train, 60)
+
+println("Train suite, mean value after seend data: $(mean(train))")
+
+

@@ -1,10 +1,11 @@
 module thinkbayes
 
 export Pmf, create_pmf, prob, probs, total, mult!, normalize!
-export Suite, update!
+export Suite, update!, mean
 
 
 Pmf{T} = Dict{T, Float64} where T <: Any
+
 
 function Base.show(io::IO, pmf::Pmf{T}) where T <: Any
     print(io, "Pmf(")
@@ -12,12 +13,14 @@ function Base.show(io::IO, pmf::Pmf{T}) where T <: Any
     print(io, ")")
 end
 
+
 function Base.show(io::IO, ::MIME"text/plain", pmf::Pmf{T}) where T <: Any
     print(io, "Probability mass function:\n")
     for (k, v) in pmf
         print(io, " $k => $v\n")
     end
 end
+
 
 function create_pmf(hypos::AbstractArray{T, 1}) where T <: Any
     pmf = Pmf{T}()
@@ -63,6 +66,16 @@ function normalize!(pmf::Pmf; fraction::Float64=1.0)
     pmf
 end
 
+
+function mean(pmf::Pmf{T}) where T <: Number
+    mu = 0.0
+    for (hypo, prob) in pmf
+        mu += hypo * prob
+    end
+    mu
+end
+
+
 struct Suite
     pmf :: Pmf
     likelihood
@@ -80,11 +93,13 @@ function update!(suite::Suite, data)
     normalize!(suite.pmf)
 end
 
+mean(suite::Suite) = mean(suite.pmf)
+
 function Base.show(io::IO, suite::Suite)
     print(io, "Suite($(suite.pmf))")
 end
 
-function Base.show(io::IO, ::MIME"text/plain", suite)
+function Base.show(io::IO, ::MIME"text/plain", suite::Suite)
     print(io, "Bayesian suite\n")
     print(io, " current pmf:\n")
     for (k, v) in suite.pmf
@@ -92,7 +107,6 @@ function Base.show(io::IO, ::MIME"text/plain", suite)
     end
     print(io, " likelihood: $(string(suite.likelihood))\n")
 end
-
 
 
 end # end of module
