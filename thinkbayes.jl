@@ -1,7 +1,7 @@
 module thinkbayes
 
 export Pmf, create_pmf, create_pmf_power_law, prob, probs, total, mult!, normalize!
-export Suite, update!, mean
+export Suite, update!, mean, percentile
 
 
 Pmf{T} = Dict{T, Float64} where T <: Any
@@ -67,6 +67,26 @@ function mult!(pmf::Pmf{T}, x::T, factor) where T <: Any
 end
 
 
+function percentile(pmf::Pmf{T}, percentage::Number) where T<: Number
+    if !(0.0 <= percentage <= 100.0)
+        error("percentage must be in [0, 100]")
+    end
+
+    p = percentage / 100.0
+    total = 0.0
+    ret = 0.0
+    # TODO: replacing Dict with SortedDict from DataStructures.jl
+    # could be an option
+    for (val, prob) in sort(collect(pmf))
+        total += prob
+        if total >= p
+            ret = val
+            break
+        end
+    end
+    ret
+end
+
 function normalize!(pmf::Pmf; fraction::Float64=1.0)
     norm = total(pmf)
 
@@ -113,6 +133,8 @@ function update!(suite::Suite, data)
 end
 
 mean(suite::Suite) = mean(suite.pmf)
+
+percentile(suite::Suite, percentage::Number) = percentile(suite.pmf, percentage)
 
 function Base.show(io::IO, suite::Suite)
     print(io, "Suite($(suite.pmf))")
