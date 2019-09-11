@@ -1,6 +1,7 @@
 push!(LOAD_PATH, pwd())
 
 using thinkbayes
+using UnicodePlots
 
 # dice problem
 
@@ -58,3 +59,10 @@ println("Train suite (power law posterior), mean value after seen data: "
         * "$(mean(train_pow_law))")
 println("Credible intervall for train suite: "
         * "($(percentile(train_pow_law, 5)), $(percentile(train_pow_law, 95)))")
+
+plt = scatterplot(collect(keys(train_pow_law.pmf)), collect(values(train_pow_law.pmf)),
+                  name = "uniform")
+scatterplot!(plt, collect(keys(train.pmf)), collect(values(train.pmf)),
+             name = "power law")
+
+println(plt)
