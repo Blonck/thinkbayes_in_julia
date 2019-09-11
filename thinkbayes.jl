@@ -6,7 +6,7 @@ export Suite, update!, mean, percentile
 
 Pmf{T} = Dict{T, Float64} where T <: Any
 
-"""Print Pmf to command line."""
+"""Print Pmf to console."""
 function Base.show(io::IO, pmf::Pmf{T}) where T <: Any
     print(io, "Pmf(")
     print(io, join(["$k=>$v" for (k, v) in pmf], ","))
@@ -168,19 +168,37 @@ function percentile(pmf::Pmf{T}, percentage::Number) where T<: Number
 end
 
 
+"""
+Encapsulates multiple hypotheses and their probabilities.
+"""
 struct Suite
     pmf :: Pmf
     likelihood
 
+    """
+        Suite(hypos::AbstractArray{T, 1}, likelihood)
+
+    Construct a suite by a list of hypotheses and likelihood function.
+    """
     function Suite(hypos::AbstractArray{T, 1}, likelihood) where T <: Any
         new(create_pmf(hypos), likelihood)
     end
 
+    """
+        Suite(pmf::Pmf{T}, likelihood)
+
+    Constuct a suite by a Pmf and a likelihood function.
+    """
     function Suite(pmf::Pmf{T}, likelihood) where T <: Any
         new(pmf, likelihood)
     end
 end
 
+"""
+    update!(suite::Suite, data)
+
+    Updates a suite with a data sample.
+"""
 function update!(suite::Suite, data)
     for hypo in keys(suite.pmf)
         like = suite.likelihood(suite.pmf, data, hypo)
@@ -189,14 +207,18 @@ function update!(suite::Suite, data)
     normalize!(suite.pmf)
 end
 
+""" Mean value of all probabilities in a suite. """
 mean(suite::Suite) = mean(suite.pmf)
 
+""" Percentile of a suite """
 percentile(suite::Suite, percentage::Number) = percentile(suite.pmf, percentage)
 
+"""Print suite to console."""
 function Base.show(io::IO, suite::Suite)
     print(io, "Suite($(suite.pmf))")
 end
 
+"""Print suite as MIME type "text/plain"."""
 function Base.show(io::IO, ::MIME"text/plain", suite::Suite)
     print(io, "Bayesian suite\n")
     print(io, " current pmf:\n")
