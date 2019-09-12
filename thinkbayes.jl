@@ -2,6 +2,8 @@ module thinkbayes
 
 export Pmf, create_pmf, create_pmf_power_law, prob, probs, total, mult!, normalize!
 export Suite, update!, mean, percentile
+export Cdf, value
+
 
 
 Pmf{T} = Dict{T, Float64} where T <: Any
@@ -228,5 +230,93 @@ function Base.show(io::IO, ::MIME"text/plain", suite::Suite)
     print(io, " likelihood: $(string(suite.likelihood))\n")
 end
 
+
+
+"""
+Represents a cumulative distribution function.
+"""
+struct Cdf
+    """
+    Sequence of values.
+    """
+    values :: AbstractArray{Number, 1}
+    """
+    Sequence of probabilities
+    """
+    probs :: AbstractArray{AbstractFloat, 1}
+    """
+    Name for this cdf
+    """
+    name
+
+    """
+        Cdf(values::AbstractArray{Number, 1}=[],probs::AbstractArray{Number, 1}=[], name="")
+
+    Construct a cumulative distribution function by its values and corresponding probabilities.
+    """
+    function Cdf(values::AbstractArray{T1, 1}=[],
+                 probs::AbstractArray{T2, 1}=[],
+                 name="") where {T1<:Number, T2<:Number}
+        new(values, probs, name)
+    end
+
+    """
+        Cdf(items::Dict{T1, T2}, name="") where {T1<:Number, T2<:Number}
+
+    Construct a cumulative distribution function by given a dictionary of values and
+    their corresponding frequencies.
+    """
+    function Cdf(items::Dict{T1, T2}, name="") where {T1<:Number, T2<:Number}
+        # all elements as sorted (by key) array of pairs
+        sorted = sort(collect(items))
+        values = first.(sorted)
+        probs = float(cumsum(last.(sorted)))
+        norm = sum(float(last.(sorted)))
+        new(values, probs/norm, name)
+    end
+
+    """ Construct a cumulative distribution function by a given probability mass function. """
+    Cdf(suite::Suite) = Cdf(suite.pmf)
+end
+
+
+"""
+    value(cdf::Cdf, p::AbstractFloat)
+
+Return the value to a given probability of a cdf.
+
+If the probability is not given in the discrete set of probabilities, the next larger
+value is returned.
+"""
+function value(cdf::Cdf, p::AbstractFloat)
+    if !(0.0 <= p <= 1.0)
+        error("p must be in [0.0, 1.0]")
+    end
+
+    if p == 0.0
+        return cdf.values[1]
+    end
+
+    if p == 1.0
+        return cdf.values[:end]
+    end
+    index = first(searchsorted(cdf.probs, p))
+
+    cdf.values[index]
+end
+
+
+"""
+    percentile(cdf::Cdf, percentage::Number)
+
+Calculates the percentile of a cdf for a given percentage.
+
+# Arguments
+- `cdf::Cdf`: Cumulative distribution function
+- `percentage::Number`: Percentage in [0, 100]
+"""
+function percentile(cdf::Cdf, percentage::Number)
+    value(cdf, percentage / 100.0)
+end
 
 end # end of module

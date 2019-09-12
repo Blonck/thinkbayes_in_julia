@@ -60,9 +60,14 @@ println("Train suite (power law posterior), mean value after seen data: "
 println("Credible intervall for train suite: "
         * "($(percentile(train_pow_law, 5)), $(percentile(train_pow_law, 95)))")
 
+cdf_train_pow_law = Cdf(train_pow_law)
+@assert percentile(train_pow_law, 5) == percentile(cdf_train_pow_law, 5)
+@assert percentile(train_pow_law, 95) == percentile(cdf_train_pow_law, 95)
+
 plt = scatterplot(collect(keys(train_pow_law.pmf)), collect(values(train_pow_law.pmf)),
                   name = "uniform")
 scatterplot!(plt, collect(keys(train.pmf)), collect(values(train.pmf)),
              name = "power law")
 
 println(plt)
+
