@@ -311,4 +311,20 @@ function percentile(cdf::Cdf, percentage::Number)
     value(cdf, percentage / 100.0)
 end
 
+"""Print Cdf to console."""
+function Base.show(io::IO, cdf::Cdf) where T <: Any
+    print(io, "Cdf(")
+    print(io, join(["$k=>$v" for (k, v) in zip(cdf.values, cdf.probs)], ","))
+    print(io, ")")
+end
+
+"""Print Pmf as MIME type "text/plain"."""
+function Base.show(io::IO, ::MIME"text/plain", cdf::Cdf) where T <: Any
+    print(io, "Probability mass function:\n")
+    for (k, v) in zip(cdf.values, cdf.probs)
+        print(io, " $k => $v\n")
+    end
+end
+
+
 end # end of module
