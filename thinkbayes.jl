@@ -293,15 +293,7 @@ function value(cdf::Cdf, p::AbstractFloat)
         error("p must be in [0.0, 1.0]")
     end
 
-    if p == 0.0
-        return cdf.values[1]
-    end
-
-    if p == 1.0
-        return cdf.values[:end]
-    end
     index = first(searchsorted(cdf.probs, p))
-
     cdf.values[index]
 end
 
