@@ -1,6 +1,7 @@
 module thinkbayes
 
 export Pmf, create_pmf, create_pmf_power_law, prob, probs, total, mult!, normalize!
+export maximumlikelihood
 export Suite, update!, mean, percentile
 export Cdf, value
 
@@ -169,6 +170,16 @@ function percentile(pmf::Pmf{T}, percentage::Number) where T<: Number
     ret
 end
 
+"""
+    maximumlikelihood(pmf::Pmf{T}) where T <: Any
+
+    Return the value with the highest probability
+"""
+function maximumlikelihood(pmf::Pmf{T}) where T <: Any
+    prob, val = findmax(pmf)
+    val
+end
+
 
 """
 Encapsulates multiple hypotheses and their probabilities.
@@ -197,16 +208,27 @@ struct Suite
 end
 
 """
-    update!(suite::Suite, data)
+    update!(suite::Suite, datum)
 
-    Updates a suite with a data sample.
+    Updates a suite with a datum
 """
-function update!(suite::Suite, data)
+function update!(suite::Suite, datum)
     for hypo in keys(suite.pmf)
-        like = suite.likelihood(suite.pmf, data, hypo)
+        like = suite.likelihood(suite.pmf, datum, hypo)
         mult!(suite.pmf, hypo, like)
     end
     normalize!(suite.pmf)
+end
+
+"""
+    update!(suite::Suite, data::AbstractArray{T, 1}) where T <: Any
+
+    Update a suite with multiple data samples
+"""
+function update!(suite::Suite, data::AbstractArray{T, 1}) where T <: Any
+    for datum in data
+        update!(suite, datum)
+    end
 end
 
 """ Mean value of all probabilities in a suite. """
@@ -214,6 +236,10 @@ mean(suite::Suite) = mean(suite.pmf)
 
 """ Percentile of a suite """
 percentile(suite::Suite, percentage::Number) = percentile(suite.pmf, percentage)
+
+""" Return the value with the highest probability """
+maximumlikelihood(suite::Suite) = maximumlikelihood(suite.pmf)
+
 
 """Print suite to console."""
 function Base.show(io::IO, suite::Suite)

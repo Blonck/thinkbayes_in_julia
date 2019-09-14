@@ -70,4 +70,3 @@ scatterplot!(plt, collect(keys(train.pmf)), collect(values(train.pmf)),
              name = "power law")
 
 println(plt)
-
