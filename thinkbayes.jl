@@ -243,6 +243,9 @@ mean(suite::Suite) = mean(suite.pmf)
 """ Percentile of a suite """
 percentile(suite::Suite, percentage::Number) = percentile(suite.pmf, percentage)
 
+""" Returns probability of hypothesis x from probability mass function in suite """
+prob(suite::Suite, x::T, default::Float64=0.0) where T <: Number = prob(suite.pmf, x, default)
+
 """ Return the value with the highest probability """
 maximumlikelihood(suite::Suite) = maximumlikelihood(suite.pmf)
 
