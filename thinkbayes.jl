@@ -1,7 +1,7 @@
 module thinkbayes
 
 export Pmf, create_pmf, create_pmf_power_law, prob, probs, total, mult!, normalize!
-export maximumlikelihood
+export maximumlikelihood, credibleinterval
 export Suite, update!, mean, percentile
 export Cdf, value
 
@@ -170,6 +170,12 @@ function percentile(pmf::Pmf{T}, percentage::Number) where T<: Number
     ret
 end
 
+""" Computes a credible interval for a given percentage """
+function credibleinterval(pmf::Pmf{T}, percentage::Number) where T <: Number
+    cdf = Cdf(pmf)
+    credibleinterval(cdf, percentage)
+end
+
 """
     maximumlikelihood(pmf::Pmf{T}) where T <: Any
 
@@ -240,6 +246,9 @@ percentile(suite::Suite, percentage::Number) = percentile(suite.pmf, percentage)
 """ Return the value with the highest probability """
 maximumlikelihood(suite::Suite) = maximumlikelihood(suite.pmf)
 
+""" Computes a credible interval for a given percentage """
+credibleinterval(suite::Suite, percentage) = credibleinterval(suite.pmf, percentage)
+
 
 """Print suite to console."""
 function Base.show(io::IO, suite::Suite)
@@ -302,7 +311,7 @@ struct Cdf
     end
 
     """ Construct a cumulative distribution function by a given probability mass function. """
-    Cdf(suite::Suite) = Cdf(suite.pmf)
+    Cdf(suite::Suite, name="") = Cdf(suite.pmf, name)
 end
 
 
@@ -335,6 +344,14 @@ Calculates the percentile of a cdf for a given percentage.
 """
 function percentile(cdf::Cdf, percentage::Number)
     value(cdf, percentage / 100.0)
+end
+
+
+""" Computes a credible interval for a given percentage """
+function credibleinterval(cdf::Cdf, percentage::Number)
+    prob = (1.0 - percentage / 100.0) / 2.0
+    interval = (value(cdf, prob), value(cdf, 1.0 - prob))
+    return interval
 end
 
 """Print Cdf to console."""

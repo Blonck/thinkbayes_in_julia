@@ -21,4 +21,5 @@ plt = scatterplot(collect(keys(euro.pmf)), collect(values(euro.pmf)),
                   name = "uniform")
 println("Euro suite after seen data, mean: $(mean(euro))")
 println("Euro suite after seen data, max. likelihood: $(maximumlikelihood(euro))")
+println("Euro suite after seen data, credible interval: $(credibleinterval(euro, 90))")
 println(plt)
