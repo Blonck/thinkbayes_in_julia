@@ -213,16 +213,21 @@ struct Suite
     end
 end
 
+
+function unnormalized_update!(suite::Suite, datum)
+    for hypo in keys(suite.pmf)
+        like = suite.likelihood(suite.pmf, datum, hypo)
+        mult!(suite.pmf, hypo, like)
+    end
+end
+
 """
     update!(suite::Suite, datum)
 
     Updates a suite with a datum
 """
 function update!(suite::Suite, datum)
-    for hypo in keys(suite.pmf)
-        like = suite.likelihood(suite.pmf, datum, hypo)
-        mult!(suite.pmf, hypo, like)
-    end
+    unnormalized_update!(suite, datum)
     normalize!(suite.pmf)
 end
 
@@ -233,8 +238,9 @@ end
 """
 function update!(suite::Suite, data::AbstractArray{T, 1}) where T <: Any
     for datum in data
-        update!(suite, datum)
+        unnormalized_update!(suite, datum)
     end
+    normalize!(suite.pmf)
 end
 
 """ Mean value of all probabilities in a suite. """
