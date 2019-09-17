@@ -179,7 +179,7 @@ end
 """
     maximumlikelihood(pmf::Pmf{T}) where T <: Any
 
-    Return the value with the highest probability
+Return the value with the highest probability
 """
 function maximumlikelihood(pmf::Pmf{T}) where T <: Any
     prob, val = findmax(pmf)
@@ -214,6 +214,7 @@ struct Suite
 end
 
 
+""" Helper function for updating a suite """
 function unnormalized_update!(suite::Suite, datum)
     for hypo in keys(suite.pmf)
         like = suite.likelihood(suite.pmf, datum, hypo)
@@ -221,20 +222,22 @@ function unnormalized_update!(suite::Suite, datum)
     end
 end
 
+
 """
     update!(suite::Suite, datum)
 
-    Updates a suite with a datum
+Updates a suite with a datum
 """
 function update!(suite::Suite, datum)
     unnormalized_update!(suite, datum)
     normalize!(suite.pmf)
 end
 
+
 """
     update!(suite::Suite, data::AbstractArray{T, 1}) where T <: Any
 
-    Update a suite with multiple data samples
+Update a suite with multiple data samples
 """
 function update!(suite::Suite, data::AbstractArray{T, 1}) where T <: Any
     for datum in data
@@ -242,6 +245,7 @@ function update!(suite::Suite, data::AbstractArray{T, 1}) where T <: Any
     end
     normalize!(suite.pmf)
 end
+
 
 """ Mean value of all probabilities in a suite. """
 mean(suite::Suite) = mean(suite.pmf)
