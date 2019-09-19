@@ -46,7 +46,7 @@ update!(train, 60)
 println("Train suite, mean value after seend data: $(mean(train))")
 
 
-pmf_train_power_law = create_pmf_power_law(collect(1:2000))
+pmf_train_power_law = create_pmf(collect(1:2000), prior="power_law")
 train_pow_law = Suite(pmf_train_power_law, likelihood_train)
 
 println("Train suite (power law posterior), mean value: $(mean(train_pow_law))")

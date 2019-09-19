@@ -25,7 +25,7 @@ println("")
 
 # The Bayesian framework
 
-cookie = create_pmf(["Bowl 1", "Bowl 2"])
+cookie = Pmf(["Bowl 1", "Bowl 2"])
 
 println("initial pmf of the cookie problem $cookie")
 
